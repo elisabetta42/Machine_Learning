@@ -4,7 +4,7 @@
 require(gmodels)
 require(caret)
 require(class)
-source('Desktop/ML/Machine_Learning/EXERCISE_3/loadImage.R')
+source('Desktop/ML/Machine_Learning/EXERCISE_4/loadImage.R')
 folder <- "Desktop/ML/trunk/2017/group"
 
 getAllData <- function(dataList){
@@ -26,8 +26,8 @@ dataList <- list(
   list(1,2,3), #0
   list(1,2,3),  #1
   list(1,2,3), #2
-  list(1,2,3,4) #3
-  #list(1,2) #4
+  list(1,2,3,4), #3
+  list(1,2,3) #4
   #list(), #5
   #list(), #6
   #list(1,2), #7

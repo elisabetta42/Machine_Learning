@@ -18,9 +18,9 @@ range_max <- max(pca$x[, j])
 range_min <- min(pca$x[, j])
 value_range <- range_max - range_min #have the range distance
 #Take five first pca
-steps = 30
+steps = 20
 cuts <- seq(min(pca$x[, j]), max(pca$x[, j]), length.out = steps)
-inf_gain_table <- vector(mode="numeric", length=length(cuts))
+inf_gain_table <- vector(mode="numeric", length=steps)
 first_pca <-  pca$x[, j]
 
 for (i in 1:length(cuts)) {
@@ -32,23 +32,24 @@ for (i in 1:length(cuts)) {
   #calculate the after entropy for the elements below the threshold
   
   pro <- table(labels) / length(labels)
-  before_entropy <- sum(-pro * log(pro))
+  before_entropy <- sum(-pro * log2(pro), na.rm =T)
   pro <-
     table(labels[below_range]) / length(labels[below_range]) #probability table for every digit
-  after_entropy_below <- sum(-pro * log(pro))
+  after_entropy_below <- sum(-pro * log2(pro), na.rm =T)
   
   pro <-
     table(labels[above_range]) / length(labels[above_range]) #probability table for every digit
-  after_entropy_above <- sum(-pro * log(pro))
+  after_entropy_above <- sum(-pro * log2(pro), na.rm =T)
   
-  after_entropy = (length(below_range) * after_entropy_below) / length(labels) + (length(above_range) *
-                                                                                    after_entropy_below) / length(labels)
+  after_entropy =( (length(labels[below_range]) * after_entropy_below)  + 
+                     (length(labels[above_range]) * after_entropy_above) ) / length(labels)
   
-  information_gain = after_entropy - before_entropy
+  information_gain =   before_entropy - after_entropy
   
   inf_gain_table[i] <- information_gain
 }
 
-plot(inf_gain_table)
+plot(cuts,inf_gain_table)
+lines(cuts,inf_gain_table)
 }
 
