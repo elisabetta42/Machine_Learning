@@ -26,6 +26,5 @@ ctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
 # by default random forest will use sqrt(324) features pr. tree
 # well tests with 18 features, half that. double that and so forth
 variables <- c(9, seq(18, 324, length.out = 18))
-#Add 9 to the list of variables!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 grid_rf <- expand.grid(.mtry = variables)
 m_rf <- train(as.factor(trainlabels) ~ ., data = train, method = "rf", metric = "Kappa", trControl = ctrl, tuneGrid = grid_rf)
