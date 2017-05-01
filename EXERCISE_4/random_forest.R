@@ -2,7 +2,7 @@ require(randomForest)
 require(caret)
 require(mlbench)
 #what you can set numbers of tree and parameters
-source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_4/load_dataset.R')
+#source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_4/load_dataset.R')
 
 #Devide into training and test sets
 train <-dataset[1:4000,-1]
@@ -25,9 +25,9 @@ mtry <- c(9, 18, 144, 324)
 tunegrid <- expand.grid(.mtry = mtry)
 
 # train the random forest model
-rf_default <- train(train, as.factor(trainlabels), method="rf", metric="Kappa", tuneGrid=tunegrid, trControl=control)
+rf_default <- train(train, as.factor(trainlabels), method="rf", metric="Accuracy", tuneGrid=tunegrid, trControl=control)
 prediction <- predict(rf_default, newdata = test)
 confusion<-confusionMatrix(prediction, as.factor(testlabels))
 accuracy <- confusion$overall['Accuracy']
 trellis.par.set(caretTheme())
-plot(rf_default)   
+plot(rf_default, main = "Random Forest Cross Validation")   
