@@ -1,8 +1,11 @@
 require(caret)
 require(RSNNS)
 require(kernlab)
+require(caret)
 #what you can set numbers of tree and parameters
 source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/load_dataset.R')
+source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/plotConfusion')
+
 
 ####### ARTIFICIAL NEURAL NETWORK ########
 # Define nn training set
@@ -44,6 +47,7 @@ agreement_rbf <- responselist[,1] == testlabels
 table(agreement_rbf)
 prop.table(table(agreement_rbf))
 
+
 ########### SUPPORT VECTOR MACHINE ########
 ciphers_train <- dataset[1:4000, -1]
 ciphers_train_label <- as.factor(dataset[1:4000, 1])
@@ -60,3 +64,4 @@ svm_agreement <- svm_prediction == ciphers_test_label
 table(svm_agreement)
 prop.table(table(svm_agreement))
 
+draw_confusion_matrix(confusion)
