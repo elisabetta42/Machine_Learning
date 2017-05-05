@@ -1,8 +1,10 @@
 require(caret)
 require(RSNNS)
+require(kernlab)
 #what you can set numbers of tree and parameters
 source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/load_dataset.R')
 
+####### ARTIFICIAL NEURAL NETWORK ########
 # Define nn training set
 
 trainlabels <- as.factor(dataset[1:4000,1])
@@ -42,4 +44,19 @@ agreement_rbf <- responselist[,1] == testlabels
 table(agreement_rbf)
 prop.table(table(agreement_rbf))
 
-           
+########### SUPPORT VECTOR MACHINE ########
+ciphers_train <- dataset[1:4000, -1]
+ciphers_train_label <- as.factor(dataset[1:4000, 1])
+ciphers_test <- dataset[4001:8000, -1]
+ciphers_test_label <- as.factor(dataset[4001:8000, 1])
+
+# create SVM model
+svm_model <- ksvm(ciphers_train_label~ ., data = ciphers_train, kernel = "rbfdot", C = 1)
+
+svm_prediction <- predict(svm_model, ciphers_test, type = "response")
+svm_agreement <- svm_prediction == ciphers_test_label 
+
+#print results
+table(svm_agreement)
+prop.table(table(svm_agreement))
+
