@@ -5,6 +5,10 @@ require(caret)
 #what you can set numbers of tree and parameters
 source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/load_dataset.R')
 source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/plotConfusion')
+#import the function from Github
+library(devtools)
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+
 
 
 ####### ARTIFICIAL NEURAL NETWORK ########
@@ -28,9 +32,13 @@ for (i in 1:length(trainlabels)) {
 trainingClass <- as.data.frame(nntrainingClass)
 
 # each entry represents a hidden layer, the value the number of neurons
-size = c(20, 20, 20)
+size = c(20)#, 20)#, 20)
 
-model <- mlp(x = trainingset, y = trainingClass, size = size, maxit = 600, learnFunc = "Std_Backpropagation", learnFuncParams = c(0.04, 0))
+#measure time
+time.start <- Sys.time()
+#train model
+model <- mlp(x = trainingset, y = trainingClass, size = size, maxit = 600, learnFunc = "Std_Backpropagation", learnFuncParams = c(0.045, 0))
+finished.time <- Sys.time() - time.start
 plotIterativeError(model)
 
 predictions <- predict(model, newdata = test)
@@ -47,7 +55,7 @@ agreement_rbf <- responselist[,1] == testlabels
 table(agreement_rbf)
 prop.table(table(agreement_rbf))
 
-
+#plot.nnet(model)
 ########### SUPPORT VECTOR MACHINE ########
 ciphers_train <- dataset[1:4000, -1]
 ciphers_train_label <- as.factor(dataset[1:4000, 1])
@@ -64,4 +72,8 @@ svm_agreement <- svm_prediction == ciphers_test_label
 table(svm_agreement)
 prop.table(table(svm_agreement))
 
-draw_confusion_matrix(confusion)
+confusion <- confusionMatrix(svm_prediction, ciphers_test_label)
+svm_df <- as.data.frame(confusion$table)
+svm_plot <- ggplot(svm_df, aes(x = Reference, y = Prediction)) 
+svm_plot + geom_tile(aes(fill = Freq), colour = "white")
+
