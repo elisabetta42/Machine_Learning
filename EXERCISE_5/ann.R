@@ -62,8 +62,11 @@ ciphers_train_label <- as.factor(dataset[1:4000, 1])
 ciphers_test <- dataset[4001:8000, -1]
 ciphers_test_label <- as.factor(dataset[4001:8000, 1])
 
+#measure time
+time.start2 <- Sys.time()
 # create SVM model
 svm_model <- ksvm(ciphers_train_label~ ., data = ciphers_train, kernel = "rbfdot", C = 1)
+finished.time2 <- Sys.time() - time.start2
 
 svm_prediction <- predict(svm_model, ciphers_test, type = "response")
 svm_agreement <- svm_prediction == ciphers_test_label 
