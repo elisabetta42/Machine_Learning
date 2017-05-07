@@ -7,12 +7,13 @@ require(gmodels)
 require(ggplot2)
 require(class)
 require(factoextra)
-source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/load_dataset.R')
+source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/load_dataset.R')
 # Import the function to plot neural networks from Github
 # Not sure we are going to use it though. Takes a shit ton of time!
 library(devtools)
 source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
 
+#Dataset split is 50% training / 50% Test
 # Define datasets - person dependent with and without pca
 nn.person_dep <- dataset
 nn.pca.person_dep <- prcomp(nn.person_dep, retx = TRUE, center = TRUE, scale = TRUE)
@@ -151,31 +152,68 @@ nn.pca.person_indep.time.finished <- Sys.time() - nn.pca.person_indep.time.start
 
 # TODO: PlotIterateiveError for all, with different colour lines etc.
 #plotIterativeError(nn.person_dep.model)
-
-
-## PREDICTIONS
-
-
-
-
-
-
 predictions <- predict(model, newdata = test)
 
 
+## PREDICTIONS
+nn.person_dep.prediction <- predict(nn.person_dep.model, newdata = nn.person_dep.test_set)
+nn.pca.person_dep.prediction <- predict(nn.pca.person_dep.model, newdata = nn.pca.person_dep.test_set)
+nn.person_indep.prediction <- predict(nn.person_indep.model, newdata = nn.person_indep.test_set)
+nn.pca.person_indep.prediction <- predict(nn.pca.person_indep.model, newdata = nn.pca.person_indep.test_set)
 
-
-
-#Using the "predict" function we have recieved "predictions"
-responselist <- matrix(nrow = length(predictions[,1]), ncol = 1, data = "Na")
-for(i in 1:nrow(predictions)) {
-  responselist[i,] <- toString( which(predictions[i,]==max(predictions[i,])) - 1 )
+#
+# Calculate the accuracy of the predictions 
+#
+# Person dependent, no PCA
+nn.person_dep.responselist <- matrix(nrow = length(nn.person_dep.prediction[,1]), ncol = 1, data = "Na")
+for(i in 1:nrow(nn.person_dep.prediction)) {
+  nn.person_dep.responselist[i, ] <- toString(which(nn.person_dep.prediction[i, ] == max(nn.person_dep.prediction[i, ])) - 1)
 }
-responselist <- data.frame(responselist)
-responselist[,1] <- as.factor(responselist[,1])
-# Calculating the accuracy
-agreement_rbf <- responselist[,1] == testlabels
-table(agreement_rbf)
-prop.table(table(agreement_rbf))
+nn.person_dep.responselist <- data.frame(nn.person_dep.responselist)
+nn.person_dep.responselist[,1] <- as.factor(nn.person_dep.responselist[,1])
+# Calculate accuracy
+nn.person_dep.agreement <- nn.person_dep.responselist[,1] == nn.person_dep.test_label
+nn.person_dep.table <- table(nn.person_dep.agreement)
+print(paste0("Person Dependet, no PCA: \n", prop.table(nn.person_dep.table)))
 
+#
+# Person dependent, PCA
+nn.pca.person_dep.responselist <- matrix(nrow = length(nn.pca.person_dep.prediction[,1]), ncol = 1, data = "Na")
+for(i in 1:nrow(nn.person_dep.prediction)) {
+  nn.pca.person_dep.responselist[i, ] <- toString(which(nn.pca.person_dep.prediction[i, ] == max(nn.pca.person_dep.prediction[i, ])) - 1)
+}
+nn.pca.person_dep.responselist <- data.frame(nn.pca.person_dep.responselist)
+nn.pca.person_dep.responselist[,1] <- as.factor(nn.pca.person_dep.responselist[,1])
+# Calculate accuracy
+nn.pca.person_dep.agreement <- nn.pca.person_dep.responselist[,1] == nn.pca.person_dep.test_label
+nn.pca.person_dep.table <- table(nn.pca.person_dep.agreement)
+print(paste0("Person Dependet, PCA: \n", prop.table(nn.pca.person_dep.table)))
+
+#
+# Person independent, no PCA
+nn.person_indep.responselist <- matrix(nrow = length(nn.person_indep.prediction[,1]), ncol = 1, data = "Na")
+for(i in 1:nrow(nn.person_dep.prediction)) {
+  nn.person_indep.responselist[i, ] <- toString(which(nn.person_indep.prediction[i, ] == max(nn.person_indep.prediction[i, ])) - 1)
+}
+nn.person_indep.responselist <- data.frame(nn.person_indep.responselist)
+nn.person_indep.responselist[,1] <- as.factor(nn.person_indep.responselist[,1])
+# Calculate accuracy
+nn.person_indep.agreement <- nn.person_indep.responselist[,1] == nn.person_indep.test_label
+nn.person_indep.table <- table(nn.person_indep.agreement)
+print(paste0("Person Independet, no PCA: \n", prop.table(nn.person_indep.table)))
+
+#
+# Person independent, PCA
+nn.pca.person_indep.responselist <- matrix(nrow = length(nn.pca.person_indep.prediction[,1]), ncol = 1, data = "Na")
+for(i in 1:nrow(nn.person_dep.prediction)) {
+  nn.pca.person_indep.responselist[i, ] <- toString(which(nn.pca.person_indep.prediction[i, ] == max(nn.pca.person_indep.prediction[i, ])) - 1)
+}
+nn.pca.person_indep.responselist <- data.frame(nn.pca.person_indep.responselist)
+nn.pca.person_indep.responselist[,1] <- as.factor(nn.pca.person_indep.responselist[,1])
+# Calculate accuracy
+nn.pca.person_indep.agreement <- nn.pca.person_indep.responselist[,1] == nn.pca.person_indep.test_label
+nn.pca.person_indep.table <- table(nn.pca.person_indep.agreement)
+print(paste0("Person Independet, PCA: \n", prop.table(nn.pca.person_indep.table)))
+
+#Decide if we want to plot the models.
 #plot.nnet(model)
