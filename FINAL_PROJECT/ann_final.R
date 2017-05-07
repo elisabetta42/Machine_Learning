@@ -100,20 +100,71 @@ nn.pca.person_indep.trainingClass <- as.data.frame(nn.pca.person_indep.temp.trai
 
 
 # Define network size. This was the 'best' result from our previous exercises.
-# each entry represents a hidden layer, the value the number of neurons
-size = c(20)#, 20)#, 20)
+# Each entry represents a hidden layer, the value the number of neurons
+networkSize = c(20) # ex c(#nodes, #nodes) = two layers
+networkMaxEpochs = 600
+networkLearningFunc = "Std_Backpropagation"
+networkLearningFuncParam = c(0.045, 0)
+
+#
+# Train neural network model
+#
+# Person dependent, no PCA
+
+# Measure time
+nn.person_dep.time.start <- Sys.time()
+# Train model
+nn.person_dep.model <- mlp(x = nn.person_dep.training_set, y = nn.person_dep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+# Finish time measure
+nn.person_dep.time.finished <- Sys.time() - nn.person_dep.time.start
+
+#
+# Person dependent, PCA
+
+# Measure time
+nn.pca.person_dep.time.start <- Sys.time()
+# Train model
+nn.pca.person_dep.model <- mlp(x = nn.pca.person_dep.training_set, y = nn.pca.person_dep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+# Finish time measure
+nn.pca.person_dep.time.finished <- Sys.time() - nn.pca.person_dep.time.start
+
+#
+# Person indepdendet, no PCA
+
+# Measure time
+nn.person_indep.time.start <- Sys.time()
+# Train model
+nn.person_indep.model <- mlp(x = nn.person_indep.training_set, y = nn.person_indep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+# Finish time measure
+nn.person_indep.time.finished <- Sys.time() - nn.person_indep.time.start
+
+#
+# Person independent, PCA
+
+# Measure time
+nn.pca.person_indep.time.start <- Sys.time()
+# Train model
+nn.pca.person_indep.model <- mlp(x = nn.pca.person_indep.training_set, y = nn.pca.person_indep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+# Finish time measure
+nn.pca.person_indep.time.finished <- Sys.time() - nn.pca.person_indep.time.start
 
 
-## TODO: Have an array of time and results and train the model for each dataset.
+# TODO: PlotIterateiveError for all, with different colour lines etc.
+#plotIterativeError(nn.person_dep.model)
 
-#measure time
-time.start <- Sys.time()
-#train model
-model <- mlp(x = trainingset, y = trainingClass, size = size, maxit = 600, learnFunc = "Std_Backpropagation", learnFuncParams = c(0.045, 0))
-finished.time <- Sys.time() - time.start
-plotIterativeError(model)
+
+## PREDICTIONS
+
+
+
+
+
 
 predictions <- predict(model, newdata = test)
+
+
+
+
 
 #Using the "predict" function we have recieved "predictions"
 responselist <- matrix(nrow = length(predictions[,1]), ncol = 1, data = "Na")
