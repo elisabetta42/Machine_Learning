@@ -25,7 +25,7 @@ getAllData <- function(dataList){
 }
 
 dataList <- list(
-  list(1)#,2,3)#, #0
+  list(1,2)#,3)#, #0
   #list(1)#,2,3)#,  #1
   #list(1,2,3), #2
   #list(1,2,3,4), #3
@@ -46,7 +46,7 @@ idList <- getAllData(dataList)
 dataset <- idList[1]
 dataset <- data.frame(dataset)
 
-for(i in 1:length(idList)){
+for(i in 2:length(idList)){
   idTemp <- idList[i]
   idTemp <- data.frame(idTemp)
   dataset <- rbind(dataset, idTemp)

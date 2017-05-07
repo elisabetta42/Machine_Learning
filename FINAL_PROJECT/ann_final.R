@@ -15,40 +15,53 @@ source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a5
 
 #Dataset split is 50% training / 50% Test
 # Define datasets - person dependent with and without pca
-nn.person_dep <- dataset
-nn.pca.person_dep <- prcomp(nn.person_dep, retx = TRUE, center = TRUE, scale = TRUE)
 
 # Split into training and test
 # Training lables must be as factors to be converted into levels
-nn.person_dep.training_label <- as.factor(nn.person_dep[1:(nrow(nn.person_dep)/2), 1])
-nn.person_dep.levels <- labels(nn.person_dep.training_label)
-nn.person_dep.training_set <- nn.person_dep[1:(nrow(nn.person_dep)/2), -1]
-nn.person_dep.test_label <- nn.person_dep[((nrow(nn.person_dep)/2)+1):nrow(nn.person_dep), 1]
-nn.person_dep.test_set <- nn.person_dep[((nrow(nn.person_dep)/2)+1):nrow(nn.person_dep), -1]
+nn.person_dep.training_label <- as.factor(dataset[1:(nrow(dataset)/2), 1])
+nn.person_dep.levels <- levels(nn.person_dep.training_label)
+nn.person_dep.training_set <- dataset[1:(nrow(dataset)/2), -1]
+nn.person_dep.test_label <- dataset[((nrow(dataset)/2)+1):nrow(dataset), 1]
+nn.person_dep.test_set <- dataset[((nrow(dataset)/2)+1):nrow(dataset), -1]
 
-nn.pca.person_dep.training_label <- as.factor(nn.pca.person_dep[1:(nrow(nn.pca.person_dep)/2), 1])
+nn.pca.person_dep.pca.time.start <- Sys.time()
+nn.pca.person_dep.training_label <- as.factor(dataset[1:(nrow(dataset)/2), 1])
 nn.pca.person_dep.levels <- levels(nn.pca.person_dep.training_label)
-nn.pca.person_dep.training_set <- nn.pca.person_dep[1:(nrow(nn.pca.person_dep)/2), -1]
-nn.pca.person_dep.test_label <- nn.pca.person_dep[((nrow(nn.pca.person_dep)/2)+1):nrow(nn.pca.person_dep), 1]
-nn.pca.person_dep.test_set <- nn.pca.person_dep[((nrow(nn.pca.person_dep)/2)+1):nrow(nn.pca.person_dep), -1]
+nn.pca.person_dep.temp.training_set <- dataset[1:(nrow(dataset)/2), -1]
+nn.pca.person_dep.temp.pca_train <- prcomp(nn.pca.person_dep.temp.training_set, retx = TRUE, center = TRUE, scale = TRUE)
+nn.pca.person_dep.training_set <- predict(nn.pca.person_dep.temp.pca_train, nn.pca.person_dep.temp.training_set)
+nn.pca.person_dep.test_label <- dataset[((nrow(dataset)/2)+1):nrow(dataset), 1]
+nn.pca.person_dep.temp.test_set <- dataset[((nrow(dataset)/2)+1):nrow(dataset), -1]
+nn.pca.person_dep.temp.pca_test <- prcomp(nn.pca.person_dep.temp.test_set, retx = TRUE, center = TRUE, scale = TRUE)
+nn.pca.person_dep.test_set <- predict(nn.pca.person_dep.temp.pca_test, nn.pca.person_dep.temp.test_set)
+nn.pca.person_dep.pca.time.finish <- Sys.time() - nn.pca.person_dep.pca.time.start
+# Cleanup
+rm(nn.pca.person_dep.temp.training_set, nn.pca.person_dep.temp.pca_train, nn.pca.person_dep.temp.test_set, nn.pca.person_dep.temp.pca_test)
 
-# Define datasets - person independet with and witout pca
-nn.person_indep <- dataset[sample(nrow(dataset)),]
-nn.pca.person_indep <- prcomp(nn.person_indep, retx = TRUE, center = TRUE, scale = TRUE)
+# Define datasets - person independet with and without pca
+dataset.shuffled <- dataset[sample(nrow(dataset)),]
 
 # Split into training and test
 # Training lables must be as factors to be converted into levels
-nn.person_indep.training_label <- as.factor(nn.person_indep[1:(nrow(nn.person_indep)/2), 1])
+nn.person_indep.training_label <- as.factor(dataset.shuffled[1:(nrow(dataset.shuffled)/2), 1])
 nn.person_indep.levels <- levels(nn.person_indep.training_label)
-nn.person_indep.training_set <- nn.person_indep[1:(nrow(nn.person_indep)/2), -1]
-nn.person_indep.test_label <- nn.person_indep[((nrow(nn.person_indep)/2)+1):nrow(nn.person_indep), 1]
-nn.person_indep.test_set <- nn.person_indep[((nrow(nn.person_indep)/2)+1):nrow(nn.person_indep), -1]
+nn.person_indep.training_set <- dataset.shuffled[1:(nrow(dataset.shuffled)/2), -1]
+nn.person_indep.test_label <- dataset.shuffled[((nrow(dataset.shuffled)/2)+1):nrow(dataset.shuffled), 1]
+nn.person_indep.test_set <- dataset.shuffled[((nrow(dataset.shuffled)/2)+1):nrow(dataset.shuffled), -1]
 
-nn.pca.person_indep.training_label <- as.factor(nn.pca.person_indep[1:(nrow(nn.pca.person_indep)/2), 1])
+nn.pca.person_indep.pca.time.start <- Sys.time()
+nn.pca.person_indep.training_label <- as.factor(dataset.shuffled[1:(nrow(dataset.shuffled)/2), 1])
 nn.pca.person_indep.levels <- levels(nn.pca.person_indep.training_label)
-nn.pca.person_indep.training_set <- nn.pca.person_indep[1:(nrow(nn.pca.person_indep)/2), -1]
-nn.pca.person_indep.test_label <- nn.pca.person_indep[((nrow(nn.pca.person_indep)/2)+1):nrow(nn.pca.person_indep), 1]
-nn.pca.person_indep.test_set <- nn.pca.person_indep[((nrow(nn.pca.person_indep)/2)+1):nrow(nn.pca.person_indep), -1]
+nn.pca.person_indep.temp.training_set <- dataset.shuffled[1:(nrow(dataset.shuffled)/2), -1]
+nn.pca.person_indep.temp.pca_train <- prcomp(nn.pca.person_indep.temp.training_set, retx = TRUE, center = TRUE, scale = TRUE)
+nn.pca.person_indep.training_set <- predict(nn.pca.person_indep.temp.pca_train, nn.pca.person_indep.temp.training_set)
+nn.pca.person_indep.test_label <- dataset.shuffled[((nrow(dataset.shuffled)/2)+1):nrow(dataset.shuffled), 1]
+nn.pca.person_indep.temp.test_set <- dataset.shuffled[((nrow(dataset.shuffled)/2)+1):nrow(dataset.shuffled), -1]
+nn.pca.person_indep.temp.pca_test <- prcomp(nn.pca.person_indep.temp.test_set, retx = TRUE, center = TRUE, scale = TRUE)
+nn.pca.person_indep.test_set <- predict(nn.pca.person_indep.temp.pca_test, nn.pca.person_indep.temp.test_set)
+nn.pca.person_indep.pca.time.finish <- Sys.time() - nn.pca.person_indep.pca.time.start
+# Cleanup
+rm(nn.pca.person_indep.temp.training_set, nn.pca.person_indep.temp.pca_train, nn.pca.person_indep.temp.test_set, nn.pca.person_indep.temp.pca_test)
 
 # Define nerual network training sets
 #
@@ -136,7 +149,7 @@ nn.pca.person_indep.time.finished <- Sys.time() - nn.pca.person_indep.time.start
 
 # TODO: PlotIterateiveError for all, with different colour lines etc.
 #plotIterativeError(nn.person_dep.model)
-predictions <- predict(model, newdata = test)
+#predictions <- predict(model, newdata = test)
 
 
 ## Predictions and timing
@@ -173,12 +186,13 @@ nn.person_dep.responselist[,1] <- as.factor(nn.person_dep.responselist[,1])
 # Calculate accuracy
 nn.person_dep.agreement <- nn.person_dep.responselist[,1] == nn.person_dep.test_label
 nn.person_dep.table <- table(nn.person_dep.agreement)
-print(paste0("Person Dependet, no PCA: \n", prop.table(nn.person_dep.table)))
+print("Person Dependet, no PCA: ")
+prop.table(nn.person_dep.table)
 
 #
 # Person dependent, PCA
 nn.pca.person_dep.responselist <- matrix(nrow = length(nn.pca.person_dep.prediction[,1]), ncol = 1, data = "Na")
-for(i in 1:nrow(nn.person_dep.prediction)) {
+for(i in 1:nrow(nn.pca.person_dep.prediction)) {
   nn.pca.person_dep.responselist[i, ] <- toString(which(nn.pca.person_dep.prediction[i, ] == max(nn.pca.person_dep.prediction[i, ])) - 1)
 }
 nn.pca.person_dep.responselist <- data.frame(nn.pca.person_dep.responselist)
@@ -186,7 +200,8 @@ nn.pca.person_dep.responselist[,1] <- as.factor(nn.pca.person_dep.responselist[,
 # Calculate accuracy
 nn.pca.person_dep.agreement <- nn.pca.person_dep.responselist[,1] == nn.pca.person_dep.test_label
 nn.pca.person_dep.table <- table(nn.pca.person_dep.agreement)
-print(paste0("Person Dependet, PCA: \n", prop.table(nn.pca.person_dep.table)))
+print("Person Dependet, PCA: ")
+prop.table(nn.pca.person_dep.table)
 
 #
 # Person independent, no PCA
@@ -199,12 +214,13 @@ nn.person_indep.responselist[,1] <- as.factor(nn.person_indep.responselist[,1])
 # Calculate accuracy
 nn.person_indep.agreement <- nn.person_indep.responselist[,1] == nn.person_indep.test_label
 nn.person_indep.table <- table(nn.person_indep.agreement)
-print(paste0("Person Independet, no PCA: \n", prop.table(nn.person_indep.table)))
+print("Person Independet, no PCA: ")
+prop.table(nn.person_indep.table)
 
 #
 # Person independent, PCA
 nn.pca.person_indep.responselist <- matrix(nrow = length(nn.pca.person_indep.prediction[,1]), ncol = 1, data = "Na")
-for(i in 1:nrow(nn.person_dep.prediction)) {
+for(i in 1:nrow(nn.pca.person_dep.prediction)) {
   nn.pca.person_indep.responselist[i, ] <- toString(which(nn.pca.person_indep.prediction[i, ] == max(nn.pca.person_indep.prediction[i, ])) - 1)
 }
 nn.pca.person_indep.responselist <- data.frame(nn.pca.person_indep.responselist)
@@ -212,7 +228,8 @@ nn.pca.person_indep.responselist[,1] <- as.factor(nn.pca.person_indep.responseli
 # Calculate accuracy
 nn.pca.person_indep.agreement <- nn.pca.person_indep.responselist[,1] == nn.pca.person_indep.test_label
 nn.pca.person_indep.table <- table(nn.pca.person_indep.agreement)
-print(paste0("Person Independet, PCA: \n", prop.table(nn.pca.person_indep.table)))
+print("Person Independet, PCA: ")
+prop.table(nn.pca.person_indep.table)
 
 #Decide if we want to plot the models.
 #plot.nnet(model)
