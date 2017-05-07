@@ -109,44 +109,28 @@ networkLearningFuncParam = c(0.045, 0)
 
 #
 # Train neural network model
-#
-# Person dependent, no PCA
 
-# Measure time
+# Person dependent, no PCA
 nn.person_dep.time.start <- Sys.time()
-# Train model
 nn.person_dep.model <- mlp(x = nn.person_dep.training_set, y = nn.person_dep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-# Finish time measure
 nn.person_dep.time.finished <- Sys.time() - nn.person_dep.time.start
 
-#
 # Person dependent, PCA
 
-# Measure time
 nn.pca.person_dep.time.start <- Sys.time()
-# Train model
 nn.pca.person_dep.model <- mlp(x = nn.pca.person_dep.training_set, y = nn.pca.person_dep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-# Finish time measure
 nn.pca.person_dep.time.finished <- Sys.time() - nn.pca.person_dep.time.start
 
-#
 # Person indepdendet, no PCA
 
-# Measure time
 nn.person_indep.time.start <- Sys.time()
-# Train model
 nn.person_indep.model <- mlp(x = nn.person_indep.training_set, y = nn.person_indep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-# Finish time measure
 nn.person_indep.time.finished <- Sys.time() - nn.person_indep.time.start
 
-#
 # Person independent, PCA
 
-# Measure time
 nn.pca.person_indep.time.start <- Sys.time()
-# Train model
 nn.pca.person_indep.model <- mlp(x = nn.pca.person_indep.training_set, y = nn.pca.person_indep.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-# Finish time measure
 nn.pca.person_indep.time.finished <- Sys.time() - nn.pca.person_indep.time.start
 
 
@@ -156,18 +140,22 @@ predictions <- predict(model, newdata = test)
 
 
 ## Predictions and timing
+# Person dependent, no PCA
 nn.person_dep.prediction.time.start <- Sys.time()
 nn.person_dep.prediction <- predict(nn.person_dep.model, newdata = nn.person_dep.test_set)
 nn.person_dep.prediction.time.finish <-  Sys.time() - nn.person_dep.prediction.time.start
 
+# Person dependent, PCA
 nn.pca.person_dep.prediction.time.start <- Sys.time()
 nn.pca.person_dep.prediction <- predict(nn.pca.person_dep.model, newdata = nn.pca.person_dep.test_set)
 nn.pca.person_dep.prediction.time.finish <- Sys.time() - nn.pca.person_dep.prediction.time.start
 
+# Person independent, no PCA
 nn.person_indep.prediction.time.start <- Sys.time()
 nn.person_indep.prediction <- predict(nn.person_indep.model, newdata = nn.person_indep.test_set)
 nn.person_indep.prediction.time.finish <- Sys.time() - nn.person_indep.prediction.time.start
 
+# Person independent, PCA
 nn.pca.person_indep.prediction.time.start <- Sys.time()
 nn.pca.person_indep.prediction <- predict(nn.pca.person_indep.model, newdata = nn.pca.person_indep.test_set)
 nn.pca.person_indep.prediction.time.finish <- Sys.time() - nn.pca.person_indep.prediction.time.start
