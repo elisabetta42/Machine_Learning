@@ -13,37 +13,98 @@ source('C:/Users/Christian/Documents/GitHub/Machine_Learning/EXERCISE_5/load_dat
 library(devtools)
 source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
 
-# Define datasets, person dependent and person independent
+# Define datasets - person dependent with and without pca
 nn.person_dep <- dataset
 nn.pca.person_dep <- prcomp(nn.person_dep, retx = TRUE, center = TRUE, scale = TRUE)
 
+# Split into training and test
+# Training lables must be as factors to be converted into levels
+nn.person_dep.training_label <- as.factor(nn.person_dep[1:(nrow(nn.person_dep)/2), 1])
+nn.person_dep.levels <- labels(nn.person_dep.training_label)
+nn.person_dep.training_set <- nn.person_dep[1:(nrow(nn.person_dep)/2), -1]
+nn.person_dep.test_label <- nn.person_dep[((nrow(nn.person_dep)/2)+1):nrow(nn.person_dep), 1]
+nn.person_dep.test_set <- nn.person_dep[((nrow(nn.person_dep)/2)+1):nrow(nn.person_dep), -1]
 
+nn.pca.person_dep.training_label <- as.factor(nn.pca.person_dep[1:(nrow(nn.pca.person_dep)/2), 1])
+nn.pca.person_dep.levels <- levels(nn.pca.person_dep.training_label)
+nn.pca.person_dep.training_set <- nn.pca.person_dep[1:(nrow(nn.pca.person_dep)/2), -1]
+nn.pca.person_dep.test_label <- nn.pca.person_dep[((nrow(nn.pca.person_dep)/2)+1):nrow(nn.pca.person_dep), 1]
+nn.pca.person_dep.test_set <- nn.pca.person_dep[((nrow(nn.pca.person_dep)/2)+1):nrow(nn.pca.person_dep), -1]
 
+# Define datasets - person independet with and witout pca
 nn.person_indep <- dataset[sample(nrow(dataset)),]
 nn.pca.person_indep <- prcomp(nn.person_indep, retx = TRUE, center = TRUE, scale = TRUE)
 
-# Define training and test sets. 
-# Labels must be factors for nn to classify.
+# Split into training and test
+# Training lables must be as factors to be converted into levels
+nn.person_indep.training_label <- as.factor(nn.person_indep[1:(nrow(nn.person_indep)/2), 1])
+nn.person_indep.levels <- levels(nn.person_indep.training_label)
+nn.person_indep.training_set <- nn.person_indep[1:(nrow(nn.person_indep)/2), -1]
+nn.person_indep.test_label <- nn.person_indep[((nrow(nn.person_indep)/2)+1):nrow(nn.person_indep), 1]
+nn.person_indep.test_set <- nn.person_indep[((nrow(nn.person_indep)/2)+1):nrow(nn.person_indep), -1]
 
-trainlabels <- as.factor(dataset[1:4000,1])
-trainingset <- dataset[1:4000,-1]
-trainlevels <- levels(trainlabels)
-nntrainingClass <- matrix(nrow = length(trainlabels), ncol = 10, data = 0)
+nn.pca.person_indep.training_label <- as.factor(nn.pca.person_indep[1:(nrow(nn.pca.person_indep)/2), 1])
+nn.pca.person_indep.levels <- levels(nn.pca.person_indep.training_label)
+nn.pca.person_indep.training_set <- nn.pca.person_indep[1:(nrow(nn.pca.person_indep)/2), -1]
+nn.pca.person_indep.test_label <- nn.pca.person_indep[((nrow(nn.pca.person_indep)/2)+1):nrow(nn.pca.person_indep), 1]
+nn.pca.person_indep.test_set <- nn.pca.person_indep[((nrow(nn.pca.person_indep)/2)+1):nrow(nn.pca.person_indep), -1]
 
-# Define test set
-test <- dataset[4001:8000,-1]
-testlabels <- dataset[4001:8000,1]
+# Define nerual network training sets
+#
+# Person dependent, no PCA
+nn.person_dep.temp.trainingClass <- matrix(nrow = length(nn.person_dep.training_label), ncol = 10, data = 0)
 
-# Prepare nn test set.
-for (i in 1:length(trainlabels)) {
-  matchList <- match(trainlevels, toString(trainlabels[i]))
+# Prepare nn test set
+for (i in 1:length(nn.person_dep.training_label)) {
+  matchList <- match(nn.person_dep.levels, toString(nn.person_dep.training_label[i]))
   matchList[is.na(matchList)] <- 0
-  nntrainingClass[i,] <- matchList
+  nn.person_dep.temp.trainingClass[i,] <- matchList
 }
-trainingClass <- as.data.frame(nntrainingClass)
+nn.person_dep.trainingClass <- as.data.frame(nn.person_dep.temp.trainingClass)
 
+#
+# Person dependent, PCA
+nn.pca.person_dep.temp.trainingClass <- matrix(nrow = length(nn.pca.person_dep.training_label), ncol = 10, data = 0)
+
+# Prepare nn test set
+for (i in 1:length(nn.pca.person_dep.training_label)) {
+  matchList <- match(nn.pca.person_dep.levels, toString(nn.pca.person_dep.training_label[i]))
+  matchList[is.na(matchList)] <- 0
+  nn.pca.person_dep.temp.trainingClass[i,] <- matchList
+}
+nn.pca.person_dep.trainingClass <- as.data.frame(nn.pca.person_dep.temp.trainingClass)
+
+#
+# Person independent, no PCA
+nn.person_indep.temp.trainingClass <- matrix(nrow = length(nn.person_indep.training_label), ncol = 10, data = 0)
+
+# Prepare nn test set
+for (i in 1:length(nn.person_indep.training_label)) {
+  matchList <- match(nn.person_indep.levels, toString(nn.person_indep.training_label[i]))
+  matchList[is.na(matchList)] <- 0
+  nn.person_indep.temp.trainingClass[i,] <- matchList
+}
+nn.person_indep.trainingClass <- as.data.frame(nn.person_indep.temp.trainingClass)
+
+#
+# Person independent, PCA
+nn.pca.person_indep.temp.trainingClass <- matrix(nrow = length(nn.pca.person_indep.training_label), ncol = 10, data = 0)
+
+# Prepare nn test set
+for (i in 1:length(nn.pca.person_indep.training_label)) {
+  matchList <- match(nn.pca.person_indep.levels, toString(nn.pca.person_indep.training_label[i]))
+  matchList[is.na(matchList)] <- 0
+  nn.pca.person_indep.temp.trainingClass[i,] <- matchList
+}
+nn.pca.person_indep.trainingClass <- as.data.frame(nn.pca.person_indep.temp.trainingClass)
+
+
+# Define network size. This was the 'best' result from our previous exercises.
 # each entry represents a hidden layer, the value the number of neurons
 size = c(20)#, 20)#, 20)
+
+
+## TODO: Have an array of time and results and train the model for each dataset.
 
 #measure time
 time.start <- Sys.time()
