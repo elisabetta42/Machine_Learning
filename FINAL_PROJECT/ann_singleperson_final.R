@@ -39,7 +39,7 @@ for(i in 1:length(idList)) {
   pca.levels <- levels(training_label)
   start.time <- Sys.time()
   pca.training_set.temp <- prcomp((dataset[1:(nrow(dataset)/2), -1]), retx = TRUE, center = TRUE, scale. = TRUE)
-  pca.training_set <- pca.training_set.temp$x#[,1:50]
+  pca.training_set <- pca.training_set.temp$x[,1:50]
   pca.test_label <- dataset[((nrow(dataset)/2)+1):nrow(dataset), 1]
   pca.test_set <- dataset[((nrow(dataset)/2)+1):nrow(dataset), -1]
   pca.test_set.pca <- prcomp(pca.test_set, retx = TRUE, center = TRUE, scale. = TRUE)
