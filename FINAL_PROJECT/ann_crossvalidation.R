@@ -39,11 +39,11 @@ dependent.time.predict <- table(1:length(dependent_folds))
 for (i in 1:length(dependent_folds)){
   #
   # Devide into training and test
-  training_label <- as.factor(dataset[-folds[[i]], 1])
+  training_label <- as.factor(dataset[-dependent_folds[[i]], 1])
   levels <- levels(training_label)
-  training_set <- dataset[-folds[[i]], -1]
-  test_label <- dataset[folds[[i]], 1]
-  test_set <- dataset[folds[[i]], -1]
+  training_set <- dataset[-dependent_folds[[i]], -1]
+  test_label <- dataset[dependent_folds[[i]], 1]
+  test_set <- dataset[dependent_folds[[i]], -1]
   
   #
   # Define network training set
@@ -94,13 +94,13 @@ pca.dependent.time.predict <- table(1:length(pca.dependent_folds))
 for (i in 1:length(pca.dependent_folds)){
   #
   # Devide into training and test
-  training_label <- as.factor(dataset[-folds[[i]], 1])
+  training_label <- as.factor(dataset[-pca.dependent_folds[[i]], 1])
   levels <- levels(training_label)
   start.time <- Sys.time()
-  temp.training_set <- prcomp((dataset[-folds[[i]], -1]), retx = TRUE, center = TRUE, scale. = TRUE)
+  temp.training_set <- prcomp((dataset[-pca.dependent_folds[[i]], -1]), retx = TRUE, center = TRUE, scale. = TRUE)
   training_set <- temp.training_set$x
-  test_label <- dataset[folds[[i]], 1]
-  test_set <- dataset[folds[[i]], -1]
+  test_label <- dataset[pca.dependent_folds[[i]], 1]
+  test_set <- dataset[pca.dependent_folds[[i]], -1]
   temp.test_set <- prcomp(test_set, retx = TRUE, center = TRUE, scale. = TRUE)
   test_set <- predict(temp.test_set, test_set)
   pca.dependent.time.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
@@ -153,11 +153,11 @@ independent.time.predict <- table(1:length(independent_folds))
 for (i in 1:length(independent_folds)){
   #
   # Devide into training and test
-  training_label <- as.factor(dataset.shuffled[-folds[[i]], 1])
+  training_label <- as.factor(dataset.shuffled[-independent_folds[[i]], 1])
   levels <- levels(training_label)
-  training_set <- dataset.shuffled[-folds[[i]], -1]
-  test_label <- dataset.shuffled[folds[[i]], 1]
-  test_set <- dataset.shuffled[folds[[i]], -1]
+  training_set <- dataset.shuffled[-independent_folds[[i]], -1]
+  test_label <- dataset.shuffled[independent_folds[[i]], 1]
+  test_set <- dataset.shuffled[independent_folds[[i]], -1]
   
   #
   # Define network training set
@@ -208,16 +208,16 @@ pca.independent.time.predict <- table(1:length(pca.independent_folds))
 for (i in 1:length(pca.independent_folds)){
   #
   # Devide into training and test
-  training_label <- as.factor(dataset.shuffled[-folds[[i]], 1])
+  training_label <- as.factor(dataset.shuffled[-pca.independent_folds[[i]], 1])
   levels <- levels(training_label)
   start.time <- Sys.time()
-  temp.training_set <- prcomp((dataset.shuffled[-folds[[i]], -1]), retx = TRUE, center = TRUE, scale. = TRUE)
+  temp.training_set <- prcomp((dataset.shuffled[-pca.independent_folds[[i]], -1]), retx = TRUE, center = TRUE, scale. = TRUE)
   training_set <- temp.training_set$x
-  test_label <- dataset.shuffled[folds[[i]], 1]
-  test_set <- dataset.shuffled[folds[[i]], -1]
+  test_label <- dataset.shuffled[pca.independent_folds[[i]], 1]
+  test_set <- dataset.shuffled[pca.independent_folds[[i]], -1]
   temp.test_set <- prcomp(test_set, retx = TRUE, center = TRUE, scale. = TRUE)
   test_set <- predict(temp.test_set, test_set)
-  pca.dependent.time.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
+  pca.independent.time.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   # Define network training set
@@ -235,7 +235,7 @@ for (i in 1:length(pca.independent_folds)){
   # Train neural network model
   start.time <- Sys.time()
   model <- mlp(x = training_set, y = trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-  pca.dependent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
+  pca.independent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   # Prediction
@@ -254,5 +254,5 @@ for (i in 1:length(pca.independent_folds)){
   # Calculate accuracy
   agreement <- responselist[,1] == test_label
   tt <- prop.table(table(agreement))
-  pca.dependent.accuracy[i] <- tt['TRUE']
+  pca.independent.accuracy[i] <- tt['TRUE']
 }
