@@ -41,15 +41,3 @@ dataList <- list(
   #list() #12 #omitted member 1, did not have corners.txt
 )
 
-idList <- getAllData(dataList)
-
-# You can now iterate trough the list
-dataset <- idList[1]
-dataset <- data.frame(dataset)
-
-for(i in 2:length(idList)){
-  idTemp <- idList[i]
-  idTemp <- data.frame(idTemp)
-  dataset <- rbind(dataset, idTemp)
-}
-
