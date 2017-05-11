@@ -44,7 +44,7 @@ for(i in 1:length(idList)) {
   pca.test_set <- dataset[((nrow(dataset)/2)+1):nrow(dataset), -1]
   pca.test_set.pca <- prcomp(pca.test_set, retx = TRUE, center = TRUE, scale. = TRUE)
   pca.test_set <- predict(pca.test_set.pca, pca.test_set)
-  list.time.train.pca[i] <- Sys.time() - start.time
+  list.time.train.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   # Prepare nn set
@@ -82,12 +82,12 @@ for(i in 1:length(idList)) {
   # No PCA
   start.time <- Sys.time()
   model <- mlp(x = training_set, y = trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-  list.time.ann[i] <- Sys.time() - start.time
+  list.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   # PCA
   start.time <- Sys.time()
   pca.model <- mlp(x = pca.training_set, y = pca.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
-  list.time.ann.pca[i] <- Sys.time() - start.time
+  list.time.ann.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   #Prediction
@@ -95,12 +95,12 @@ for(i in 1:length(idList)) {
   # No PCA
   start.time <- Sys.time()
   prediction <- predict(model, newdata = test_set)
-  list.time.predict[i] <-  Sys.time() - start.time
+  list.time.predict[i] <-  difftime(Sys.time(), start.time, units = "secs")
   
   # PCA
   start.time <- Sys.time()
   pca.prediction <- predict(pca.model, newdata = pca.test_set)
-  list.time.predict.pca[i] <- Sys.time() - start.time
+  list.time.predict.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   # Calculate the accuracy of the predictions 
