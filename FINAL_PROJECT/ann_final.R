@@ -7,7 +7,8 @@ require(gmodels)
 require(ggplot2)
 require(class)
 require(factoextra)
-source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+#source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/load_dataset.R')
 # Import the function to plot neural networks from Github
 # Not sure we are going to use it though. Takes a shit ton of time!
 library(devtools)

@@ -9,7 +9,8 @@ require(class)
 require(factoextra)
 
 # Load datasets 
-source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+#source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/load_dataset.R')
 
 # Set seed
 set.seed(123)
@@ -25,7 +26,7 @@ pca.independent_folds <- createFolds(dataset.shuffled$X1, k = 10)
 
 # Define network size. This was the 'best' result from our previous exercises.
 # Each entry represents a hidden layer, the value the number of neurons
-networkSize = c(20) # ex c(#nodes, #nodes) = two layers
+networkSize = c(40, 20, 20) # ex c(#nodes, #nodes) = two layers
 networkMaxEpochs = 600
 networkLearningFunc = "Std_Backpropagation"
 networkLearningFuncParam = c(0.045, 0)
@@ -60,7 +61,7 @@ for (i in 1:length(dependent_folds)){
   #
   # Train neural network model
   start.time <- Sys.time()
-  model <- mlp(x = training_set, y = trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  model <- mlp(training_set, trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
   dependent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
@@ -120,7 +121,7 @@ for (i in 1:length(pca.dependent_folds)){
   #
   # Train neural network model
   start.time <- Sys.time()
-  model <- mlp(x = training_set, y = trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  model <- mlp(training_set, trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
   pca.dependent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
@@ -174,7 +175,7 @@ for (i in 1:length(independent_folds)){
   #
   # Train neural network model
   start.time <- Sys.time()
-  model <- mlp(x = training_set, y = trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  model <- mlp(training_set, trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
   independent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
@@ -234,7 +235,7 @@ for (i in 1:length(pca.independent_folds)){
   #
   # Train neural network model
   start.time <- Sys.time()
-  model <- mlp(x = training_set, y = trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  model <- mlp(training_set, trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
   pca.independent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #

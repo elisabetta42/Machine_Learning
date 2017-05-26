@@ -5,7 +5,8 @@ require(gmodels)
 require(ggplot2)
 require(class)
 require(factoextra)
-source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/ann_load_dataset.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/ann_load_dataset.R')
+#source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/ann_load_dataset.R')
 # Import the function to plot neural networks from Github
 # Not sure we are going to use it though. Takes a shit ton of time!
 library(devtools)
@@ -28,7 +29,7 @@ for(i in 1:length(idList)) {
   dataset <- dataset[sample(nrow(dataset)),]
   
   # Divide into training and test set.
-  training_label <- as.factor(dataset[1:(nrow(dataset)/2), 1])
+  training_label <- factor(dataset[1:(nrow(dataset)/2), 1])
   levels <- levels(training_label)
   training_set <- dataset[1:(nrow(dataset)/2), -1]
   test_label <- dataset[((nrow(dataset)/2)+1):nrow(dataset), 1]
@@ -39,7 +40,7 @@ for(i in 1:length(idList)) {
   pca.levels <- levels(training_label)
   start.time <- Sys.time()
   pca.training_set.temp <- prcomp((dataset[1:(nrow(dataset)/2), -1]), retx = TRUE, center = TRUE, scale. = TRUE)
-  pca.training_set <- pca.training_set.temp$x[,1:50]
+  pca.training_set <- pca.training_set.temp$x[,1:100]
   pca.test_label <- dataset[((nrow(dataset)/2)+1):nrow(dataset), 1]
   pca.test_set <- dataset[((nrow(dataset)/2)+1):nrow(dataset), -1]
   pca.test_set.pca <- prcomp(pca.test_set, retx = TRUE, center = TRUE, scale. = TRUE)
@@ -71,10 +72,10 @@ for(i in 1:length(idList)) {
   
   #
   # Define network
-  networkSize = c(20) # ex c(#nodes, #nodes) = two layers
-  networkMaxEpochs = 600
+  networkSize = c(100, 40, 30) # ex c(#nodes, #nodes) = two layers
+  networkMaxEpochs = 150
   networkLearningFunc = "Std_Backpropagation"
-  networkLearningFuncParam = c(0.045, 0)
+  networkLearningFuncParam = c(0.1, 0)
   
   #
   # Train neural network model

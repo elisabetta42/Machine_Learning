@@ -4,10 +4,13 @@
 require(gmodels)
 require(caret)
 require(class)
-source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/loadImage.R')
+#source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/loadImage.R')
+
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/loadImage.R')
 #source('Desktop/ML/Machine_Learning/EXERCISE_4/loadImage.R')
 #folder <- "Desktop/ML/trunk/2017/group"
-folder <- 'C:/Users/Christian/Documents/Statistical Machine Learning/2017/group'
+folder <- "C:/Users/Christian Arentsen/Documents/SML/2017/group"
+#folder <- 'C:/Users/Christian/Documents/Statistical Machine Learning/2017/group'
 #folder <- 'C:/Users/Christian/Documents/Statistical Machine Learning/preProcessed/2017/group'
 
 getAllData <- function(dataList){
