@@ -1,0 +1,82 @@
+#data from all the person with a training set that includes data from all persons
+require(gmodels)
+require(caret)
+require(class)
+source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/load_dataset.R') 
+
+########################PCA##############################################################
+#function that returns a dataset containing just PCA
+create_pca_dataset<-function(dataset){
+  pers_dep_pca<-prcomp(dataset[2:length(dataset[1,])], retx=TRUE, center=TRUE, scale=TRUE)
+  pers_dep_data<-pers_dep_pca$x[,1:ncol(dataset)-1] #pca object
+  pers_dep_label<-dataset[,1] #labels from the original dataset
+  #bind the pca components with labels
+  pers_dep<-matrix(nrow = length(dataset[,1]), ncol = ncol(dataset))
+  #conevrting large matrix into data frame matrix - indexing reasoning
+  pers_dep <- as.data.frame(matrix(unlist(pers_dep), nrow = length(dataset[,1])))
+  pers_dep[,1]<-pers_dep_label
+  pers_dep[,-1]<-pers_dep_data
+  
+  return(pers_dep)
+}
+#########################################################################################
+
+#run pca
+person_dep_function<-function(){
+    pers_dep<-create_pca_dataset(dataset)
+    train_sample_num<-round((nrow(dataset)/100)*50)
+    test_sample_num<-round((nrow(dataset)/100)*50)
+    #eliminate the last index from the range to use the right number of people
+    #create a sequence to access data one person per time
+    pca_results<-matrix(nrow = length(dataset)-3) #results using 11 PCAs
+    #run for an increasing number of PCAs with a split 70-30#####################
+          for(i in ncol(dataset)){
+          #shaffle data of the person
+          pers_dep<-pers_dep[sample(nrow(pers_dep)),]
+          #take a certain number of principal component
+          pers_dep_dataset<-pers_dep[,1:i]
+          #divide between test and train
+          pers_dep_train<-pers_dep[1:(nrow(pers_dep_dataset)/2),]
+          pers_dep_test<-pers_dep[(nrow(pers_dep_dataset)/2+1):(nrow(pers_dep_dataset)),]
+          pers_dep_prediction<-knn(train = pers_dep_train[,-1], test = pers_dep_test[,-1], 
+                                   cl = pers_dep_train[,1], k = 1)
+                    
+          confusion <- confusionMatrix(pers_dep_prediction, pers_dep_test[,1])
+          pca_results[i] <- confusion$overall['Accuracy']
+    }
+    return(pca_results)
+}
+
+#printing results ordered by accuracy
+#print(pca_results)
+#result<-rowMeans(knn_results, na.rm = FALSE, dims = 1)
+#qplot(unlist(1:length(pca_results)),unlist(pca_results), geom = "line",xlab="Number of principal components",ylab="Accuracy (in percentace)") + ggtitle("Accuracy for increasing number of principal components")
+#max_pca_number<-which.max(pca_results)
+
+accuracies<-person_dep_function()
+
+###################################Cross Validation / 10 - 90% for PCA####################################
+
+#insert the necessary dataset, cross validation for pca
+cross_val_pca<-function(pers_dep){
+  runs=9
+  cross_val_results<-matrix(nrow = runs,ncol=length(pers_dep)) 
+  fold_index<-seq(0, length(dataset[,1]),round(length(dataset[,1])/100*10))#create chunk of 10% per time
+  
+  for(i in 1:runs){
+    for(j in 3:ncol(dataset)){
+      pers_dep<-pers_dep[sample(nrow(pers_dep)),1:j]
+      pers_dep_train<-pers_dep[-(fold_index[i]:fold_index[i+1]),]
+      pers_dep_test<-pers_dep[fold_index[i]:fold_index[i+1],]
+      pers_dep_prediction<-knn(train = pers_dep_train[,-1], test = pers_dep_test[,-1], 
+                               cl = pers_dep_train[,1], k = 1)
+      
+      confusion <- confusionMatrix(pers_dep_prediction, pers_dep_test[,1])
+      cross_val_results[i,j] <- confusion$overall['Accuracy']
+    }
+  }
+  return(cross_val_results)
+}
+#create dataset with PCAs
+pca<-create_pca_dataset(dataset)
+cross_val_result<-cross_val_pca(pca)
