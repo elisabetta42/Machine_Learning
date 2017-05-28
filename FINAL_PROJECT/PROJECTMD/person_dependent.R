@@ -2,74 +2,62 @@
 require(gmodels)
 require(caret)
 require(class)
-source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/load_dataset.R') 
+require(factoextra)
+#source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/load_dataset.R') 
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/load_dataset.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/createDatasets.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/kmeans.R')
 
-########################PCA##############################################################
-#function that returns a dataset containing just PCA
-create_pca_dataset<-function(dataset){
-  pers_dep_pca<-prcomp(dataset[2:length(dataset[1,])], retx=TRUE, center=TRUE, scale=TRUE)
-  pers_dep_data<-pers_dep_pca$x[,1:ncol(dataset)-1] #pca object
-  pers_dep_label<-dataset[,1] #labels from the original dataset
-  #bind the pca components with labels
-  pers_dep<-matrix(nrow = length(dataset[,1]), ncol = ncol(dataset))
-  #conevrting large matrix into data frame matrix - indexing reasoning
-  pers_dep <- as.data.frame(matrix(unlist(pers_dep), nrow = length(dataset[,1])))
-  pers_dep[,1]<-pers_dep_label
-  pers_dep[,-1]<-pers_dep_data
+
+# FIND BEST PCA THAT EXPLAINS A CERTAIN VARIANCE
+knn_with_pca<-function(dataset,p_d_max){
+  dataset<-dataset[sample(nrow(dataset)),]
+  pers_dep<-dataset
+  var_k <-c(1,3,5,7,11,21,31,41,51,61)
+  var_k_acc  <- matrix(nrow=length(var_k), ncol=length(p_d_max))
+  var_k_time <- matrix(nrow=length(var_k), ncol=length(p_d_max))
   
-  return(pers_dep)
-}
-#########################################################################################
-
-#run pca
-person_dep_function<-function(){
-    pers_dep<-create_pca_dataset(dataset)
-    train_sample_num<-round((nrow(dataset)/100)*50)
-    test_sample_num<-round((nrow(dataset)/100)*50)
-    #eliminate the last index from the range to use the right number of people
-    #create a sequence to access data one person per time
-    pca_results<-matrix(nrow = length(dataset)-3) #results using 11 PCAs
-    #run for an increasing number of PCAs with a split 70-30#####################
-          for(i in ncol(dataset)){
-          #shaffle data of the person
-          pers_dep<-pers_dep[sample(nrow(pers_dep)),]
-          #take a certain number of principal component
-          pers_dep_dataset<-pers_dep[,1:i]
-          #divide between test and train
-          pers_dep_train<-pers_dep[1:(nrow(pers_dep_dataset)/2),]
-          pers_dep_test<-pers_dep[(nrow(pers_dep_dataset)/2+1):(nrow(pers_dep_dataset)),]
-          pers_dep_prediction<-knn(train = pers_dep_train[,-1], test = pers_dep_test[,-1], 
-                                   cl = pers_dep_train[,1], k = 1)
-                    
-          confusion <- confusionMatrix(pers_dep_prediction, pers_dep_test[,1])
-          pca_results[i] <- confusion$overall['Accuracy']
-    }
-    return(pca_results)
-}
-
-#printing results ordered by accuracy
-#print(pca_results)
-#result<-rowMeans(knn_results, na.rm = FALSE, dims = 1)
-#qplot(unlist(1:length(pca_results)),unlist(pca_results), geom = "line",xlab="Number of principal components",ylab="Accuracy (in percentace)") + ggtitle("Accuracy for increasing number of principal components")
-#max_pca_number<-which.max(pca_results)
-
-accuracies<-person_dep_function()
-
-###################################Cross Validation / 10 - 90% for PCA####################################
-
-#insert the necessary dataset, cross validation for pca
-cross_val_pca<-function(pers_dep){
-  runs=9
-  cross_val_results<-matrix(nrow = runs,ncol=length(pers_dep)) 
-  fold_index<-seq(0, length(dataset[,1]),round(length(dataset[,1])/100*10))#create chunk of 10% per time
+  for(i in 1:length(p_d_max)){
+    dataset <- pers_dep[,1:p_d_max[i]]  
+    # define classification labels for dataset - 50% - 50% split
+    classification_table <- dataset[,2:length(dataset[1,])]
+    training_label <- dataset[1:(nrow(dataset)/2),1]
+    test_label <- dataset[((nrow(dataset)/2)+1):nrow(dataset),1]
+    
+    # divide into classification sets: 50/50 training testing
+    training_class <- classification_table[1:(nrow(dataset)/2),]
+    test_class <- classification_table[(nrow(dataset)/2+1):(nrow(dataset)),]
+    
+    ## Exercise 1.3
+    for (j in 1:length(var_k)){
+      #print(length(dataset))
+      start.time <- Sys.time()
+      #running knn with k = var_k(i)
+      test_pred <- knn(train = training_class, test = test_class, 
+                       cl = training_label, k = var_k[j])
+      time.taken <- Sys.time() - start.time #difftime
+      
+      #create confusion matrix and add accuracy to list
+      confusion <- confusionMatrix(test_pred, test_label)
+      var_k_acc[j,i] <- confusion$overall['Accuracy']
+      var_k_time[j,i] <- time.taken
+    }  
+  }
+  return(var_k_acc)
   
+}
+
+# CROSS VALIDATION
+# Check which cluster better suit the dataset
+
+cross_val_pca<-function(pers_dep_train,pers_dep_test,runs){
+  var_k <-c(1,3,5,7,11,21,31,41,51,61,100)
+  cross_val_results<-matrix(nrow = runs,ncol=length(var_k)) 
+ 
   for(i in 1:runs){
-    for(j in 3:ncol(dataset)){
-      pers_dep<-pers_dep[sample(nrow(pers_dep)),1:j]
-      pers_dep_train<-pers_dep[-(fold_index[i]:fold_index[i+1]),]
-      pers_dep_test<-pers_dep[fold_index[i]:fold_index[i+1],]
+    for(j in 1:length(var_k)){
       pers_dep_prediction<-knn(train = pers_dep_train[,-1], test = pers_dep_test[,-1], 
-                               cl = pers_dep_train[,1], k = 1)
+                               cl = pers_dep_train[,1], k = var_k[j])
       
       confusion <- confusionMatrix(pers_dep_prediction, pers_dep_test[,1])
       cross_val_results[i,j] <- confusion$overall['Accuracy']
@@ -77,6 +65,52 @@ cross_val_pca<-function(pers_dep){
   }
   return(cross_val_results)
 }
-#create dataset with PCAs
+createsequence<-function(lower,higher,interval){
+  fold_index<-seq(lower, higher,interval)#create chunk of 10% per time
+  return(fold_index)
+}
+
+# RUNNING STUFF 
+
+# PCA PARAMETERS
+pca_parameters<-create_p_d_pca_object(dataset)
+# CREATE PCA DATASET
+
+dataset<-dataset[sample(nrow(dataset)),]
 pca<-create_pca_dataset(dataset)
-cross_val_result<-cross_val_pca(pca)
+# TUNE PCA PARAMETERS WITH (80% - 90% - 95% - 99%)
+knn_cross_val<-knn_with_pca(pca,pca_parameters) #tune knn parameters
+
+# TUNE PARAMETERS FOR THE CLUSTER
+k=c(10)#number of clusters
+pers_dep<-pca[,1:22]
+pers_dep<-pers_dep[order(pers_dep[,1]),]
+amountofEachCipher=length(which(pers_dep[,1]==0))
+
+
+fold_index<-createsequence(0, length(dataset[,1]),round(length(dataset[,1])/100*10))
+for(c in 1:length(k)){
+  
+  # create the dataset with a predefined number of clusters
+  cluster_knn<-kMeansClusterPerformIncludeSpilt(pers_dep,k[c],amountofEachCipher)
+  labels=cluster_knn$labels
+  cluster=cluster_knn$centers
+  pca_cluster_table<-cbind(labels,cluster)
+  # tune the cluster parameters
+  pers_dep_test<-dataset[fold_index[i]:fold_index[i+1],]
+  cluster_acc<-cross_val_pca(pca_cluster_table,pers_dep_test,1)
+  
+}
+
+
+
+
+#pca_table<-cross_val_pca(pca[,1:pca_parameters[1]],10,100/10)
+#
+#fold_index<-seq(0, length(dataset[,1]),interval)#create chunk of 10% per time
+
+#pers_dep<-dataset[sample(nrow(pers_dep)),]
+#pers_dep_train<-pers_dep[-(fold_index[i]:fold_index[i+1]),]
+#pers_dep_test<-pers_dep[fold_index[i]:fold_index[i+1],]
+# CROSS VALIDATION WITH PCA
+

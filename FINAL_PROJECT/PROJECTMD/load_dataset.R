@@ -4,9 +4,11 @@
 require(gmodels)
 require(caret)
 require(class)
-source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/loadImage.R')
+#source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/loadImage.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/loadImage.R')
 #folder <- "/Users/elisabetta/Desktop/ML/trunk/preProcessed/2017/group"
-folder <- "/Users/elisabetta/Desktop/ML/trunk/2017/group"
+#folder <- "/Users/elisabetta/Desktop/ML/trunk/2017/group"
+folder <- "C:/Users/Christian Arentsen/Documents/SML/2017/group"
 getAllData <- function(dataList){
   id <- data.frame()
   idList <- list()
@@ -24,12 +26,12 @@ getAllData <- function(dataList){
 }
 
 dataList <- list(
-  list(1,2,3) #0
+  #list(1,2,3) #0
   #list(1,2,3)  #1
   #list(1,2,3), #2
   #list(1,2,3,4), #3
   #list(2,3,4), #4
-  #list(1,2,3), #5
+  list(1,2,3) #5
   #list(1,2,3), #6
   #list(1,2) #7
   #list(1), #8 #omitted member 2 and 3, as member 2 did not do it correctly
