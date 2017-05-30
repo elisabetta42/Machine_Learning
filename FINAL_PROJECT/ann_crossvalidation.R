@@ -9,20 +9,23 @@ require(class)
 require(factoextra)
 
 # Load datasets 
-source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+#source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/load_persons_modified.R')
+
 #source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/load_dataset.R')
+dataset<-loadYearData(100,2017)
 
 # Set seed
 set.seed(123)
 
 # For person dependent
-dependent_folds <- createFolds(dataset$X1, k = 10)
-pca.dependent_folds <- createFolds(dataset$X1, k = 10)
+dependent_folds <- createFolds(dataset$v1, k = 10)
+pca.dependent_folds <- createFolds(dataset$V1, k = 10)
 
 # For person independent
 dataset.shuffled <- dataset[sample(nrow(dataset)),]
-independent_folds <- createFolds(dataset.shuffled$X1, k = 10)
-pca.independent_folds <- createFolds(dataset.shuffled$X1, k = 10)
+independent_folds <- createFolds(dataset.shuffled$V1, k = 10)
+pca.independent_folds <- createFolds(dataset.shuffled$V1, k = 10)
 
 # Define network size. This was the 'best' result from our previous exercises.
 # Each entry represents a hidden layer, the value the number of neurons

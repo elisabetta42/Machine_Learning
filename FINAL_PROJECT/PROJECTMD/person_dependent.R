@@ -1,13 +1,15 @@
 #data from all the person with a training set that includes data from all persons
-require(gmodels)
-require(caret)
-require(class)
+#require(gmodels)
+#require(caret)
+#require(class)
 require(factoextra)
 #source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/load_dataset.R') 
-source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/load_dataset.R')
+#source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/load_dataset.R')
 source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/createDatasets.R')
 source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/kmeans.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/load_persons_modified.R')
 
+dataset<-loadYearData(100,2017)
 
 # FIND BEST PCA THAT EXPLAINS A CERTAIN VARIANCE
 knn_with_pca<-function(dataset,p_d_max){
@@ -82,24 +84,27 @@ pca<-create_pca_dataset(dataset)
 knn_cross_val<-knn_with_pca(pca,pca_parameters) #tune knn parameters
 
 # TUNE PARAMETERS FOR THE CLUSTER
-k=c(10)#number of clusters
+k=c(20,50,70,90,100,200,300,400,500,600,700,800,900,1000)#number of clusters
 pers_dep<-pca[,1:22]
 pers_dep<-pers_dep[order(pers_dep[,1]),]
 amountofEachCipher=length(which(pers_dep[,1]==0))
-
-
+result<-vector('list')
+test_dataset<-pers_dep
 fold_index<-createsequence(0, length(dataset[,1]),round(length(dataset[,1])/100*10))
+
 for(c in 1:length(k)){
   
   # create the dataset with a predefined number of clusters
-  cluster_knn<-kMeansClusterPerformIncludeSpilt(pers_dep,k[c],amountofEachCipher)
+  cluster_knn<-kMeansClusterPerformIncludeSpilt(test_dataset,k[c],amountofEachCipher)
+  pers_dep<-pers_dep[sample(nrow(pers_dep)),]
   labels=cluster_knn$labels
   cluster=cluster_knn$centers
   pca_cluster_table<-cbind(labels,cluster)
+  pca_cluster_table<-pca_cluster_table[sample(nrow(pca_cluster_table)),]
   # tune the cluster parameters
-  pers_dep_test<-dataset[fold_index[i]:fold_index[i+1],]
-  cluster_acc<-cross_val_pca(pca_cluster_table,pers_dep_test,1)
-  
+  pers_dep_test<-pers_dep[fold_index[c]:fold_index[c+1],]
+  cluster_acc<-cross_val_pca(pca_cluster_table,pers_dep_test,10)
+  result[[c]]<-cluster_acc
 }
 
 

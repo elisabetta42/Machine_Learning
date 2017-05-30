@@ -1,15 +1,15 @@
 #-------------------------------------------------------------
 #load libraries
 #-------------------------------------------------------------
-require("png")
-require("EBImage")
-require("class")
-require("gmodels")
-require("ggplot2")
-require("caret")
-#require("lda")
-#require("neuralnet")
-#require("RSNNS")
+library("png")
+library("EBImage")
+library("class")
+library("gmodels")
+library("ggplot2")
+library("caret")
+#library("lda")
+#library("neuralnet")
+#library("RSNNS")
 #install.packages("neuralnet")
 
 
@@ -109,15 +109,18 @@ loadSinglePersonsData <- function(DPI,groupNr,groupMemberNr,folder){
   #  gray <- list(1:5)
   #   smoothed <- list(1:5)
   prepared <- list(1:5)
-  
-  
+
   #convert the images to gray scale.
   for(i in 1:5)
   {
-    r <-ciffers[[i]][,,1]
-    g <-ciffers[[i]][,,2]
-    b <-ciffers[[i]][,,3]
-    prepared[[i]] <- (r+g+b)/3
+    if( length(dim(ciffers[[1]]) ) == 3 ) {
+      r <-ciffers[[i]][,,1]
+      g <-ciffers[[i]][,,2]
+      b <-ciffers[[i]][,,3]
+      prepared[[i]] <- (r+g+b)/3
+    } else {
+      prepared[[i]] <- ciffers[[i]]
+    }  
   }
   
   #smooth images based on the funtion in the top
@@ -134,6 +137,7 @@ loadSinglePersonsData <- function(DPI,groupNr,groupMemberNr,folder){
   
   #xStepT and yStepT is used to ensure that the feature vectors
   #from all people have the same size.
+
   xStepT <- 60*DPI/300
   yStepT <- 60*DPI/300
   
