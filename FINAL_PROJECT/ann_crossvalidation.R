@@ -19,7 +19,7 @@ dataset<-loadYearData(100,2017)
 set.seed(123)
 
 # For person dependent
-dependent_folds <- createFolds(dataset$v1, k = 10)
+dependent_folds <- createFolds(dataset$V1, k = 10)
 pca.dependent_folds <- createFolds(dataset$V1, k = 10)
 
 # For person independent
@@ -29,10 +29,13 @@ pca.independent_folds <- createFolds(dataset.shuffled$V1, k = 10)
 
 # Define network size. This was the 'best' result from our previous exercises.
 # Each entry represents a hidden layer, the value the number of neurons
-networkSize = c(40, 20, 20) # ex c(#nodes, #nodes) = two layers
-networkMaxEpochs = 600
+networkSize = c(100, 40, 30) # ex c(#nodes, #nodes) = two layers
+pca.networkSize = c(40, 20, 20)
+networkMaxEpochs = 150
+pca.networkMaxEpochs = 50
 networkLearningFunc = "Std_Backpropagation"
-networkLearningFuncParam = c(0.045, 0)
+networkLearningFuncParam = c(0.1, 0)
+pca.networkLearningFuncParam = c(0.2, 0)
 
 #
 #### Person dependent no PCA ####
@@ -85,6 +88,8 @@ for (i in 1:length(dependent_folds)){
   agreement <- responselist[,1] == test_label
   tt <- prop.table(table(agreement))
   dependent.accuracy[i] <- tt['TRUE']
+  print("dependent")
+  print(i)
 }
 
 
@@ -102,7 +107,7 @@ for (i in 1:length(pca.dependent_folds)){
   levels <- levels(training_label)
   start.time <- Sys.time()
   temp.training_set <- prcomp((dataset[-pca.dependent_folds[[i]], -1]), retx = TRUE, center = TRUE, scale. = TRUE)
-  training_set <- temp.training_set$x
+  training_set <- temp.training_set$x[,1:100]
   test_label <- dataset[pca.dependent_folds[[i]], 1]
   test_set <- dataset[pca.dependent_folds[[i]], -1]
   temp.test_set <- prcomp(test_set, retx = TRUE, center = TRUE, scale. = TRUE)
@@ -124,13 +129,13 @@ for (i in 1:length(pca.dependent_folds)){
   #
   # Train neural network model
   start.time <- Sys.time()
-  model <- mlp(training_set, trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  model <- mlp(training_set, trainingClass, size = pca.networkSize, maxit = pca.networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = pca.networkLearningFuncParam)
   pca.dependent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   # Prediction
   start.time <- Sys.time()
-  prediction <- predict(model, newdata = test_set)
+  prediction <- predict(model, newdata = test_set[,1:100])
   pca.dependent.time.predict[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
@@ -145,6 +150,8 @@ for (i in 1:length(pca.dependent_folds)){
   agreement <- responselist[,1] == test_label
   tt <- prop.table(table(agreement))
   pca.dependent.accuracy[i] <- tt['TRUE']
+  print("dependent pca")
+  print(i)
 }
 
 
@@ -199,6 +206,8 @@ for (i in 1:length(independent_folds)){
   agreement <- responselist[,1] == test_label
   tt <- prop.table(table(agreement))
   independent.accuracy[i] <- tt['TRUE']
+  print("independent")
+  print(i)
 }
 
 
@@ -216,7 +225,7 @@ for (i in 1:length(pca.independent_folds)){
   levels <- levels(training_label)
   start.time <- Sys.time()
   temp.training_set <- prcomp((dataset.shuffled[-pca.independent_folds[[i]], -1]), retx = TRUE, center = TRUE, scale. = TRUE)
-  training_set <- temp.training_set$x
+  training_set <- temp.training_set$x[,1:100]
   test_label <- dataset.shuffled[pca.independent_folds[[i]], 1]
   test_set <- dataset.shuffled[pca.independent_folds[[i]], -1]
   temp.test_set <- prcomp(test_set, retx = TRUE, center = TRUE, scale. = TRUE)
@@ -238,13 +247,13 @@ for (i in 1:length(pca.independent_folds)){
   #
   # Train neural network model
   start.time <- Sys.time()
-  model <- mlp(training_set, trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  model <- mlp(training_set, trainingClass, size = pca.networkSize, maxit = pca.networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = pca.networkLearningFuncParam)
   pca.independent.time.ann[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
   # Prediction
   start.time <- Sys.time()
-  prediction <- predict(model, newdata = test_set)
+  prediction <- predict(model, newdata = test_set[,1:100])
   pca.dependent.time.predict[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
@@ -259,4 +268,6 @@ for (i in 1:length(pca.independent_folds)){
   agreement <- responselist[,1] == test_label
   tt <- prop.table(table(agreement))
   pca.independent.accuracy[i] <- tt['TRUE']
+  print("independent pca")
+  print(i)
 }

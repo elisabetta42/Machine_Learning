@@ -100,7 +100,7 @@ for(i in 1:length(idList)) {
   
   # PCA
   start.time <- Sys.time()
-  pca.prediction <- predict(pca.model, newdata = pca.test_set)
+  pca.prediction <- predict(pca.model, newdata = pca.test_set[,1:100])
   list.time.predict.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
