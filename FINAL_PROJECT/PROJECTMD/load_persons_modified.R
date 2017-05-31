@@ -1,9 +1,9 @@
 library('lattice')
-source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/loadImage.R')
+source('/Users/elisabetta/Desktop/ML/Machine_Learning/FINAL_PROJECT/PROJECTMD/loadImage.R')
 
 
 loadPersonData <- function(dpi, year, groupNr, personNr) {
-  year = paste(c("C:/Users/Christian Arentsen/Documents/SML/preProcessed/", year))
+  year = paste(c("/Users/elisabetta/Desktop/ML/trunk/preProcessed/", year))
   groupNr = paste(c("/group", groupNr))
   personNr = as.character(personNr)
   
