@@ -5,27 +5,31 @@ require(gmodels)
 require(ggplot2)
 require(class)
 require(factoextra)
-source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/ann_load_dataset.R')
+source('C:/Users/Christian Arentsen/Git/Machine_Learning/FINAL_PROJECT/PROJECTMD/load_persons_modified.R')
 #source('C:/Users/Christian/Documents/GitHub/Machine_Learning/FINAL_PROJECT/ann_load_dataset.R')
 # Import the function to plot neural networks from Github
 # Not sure we are going to use it though. Takes a shit ton of time!
 library(devtools)
 source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
 
-idList <- getAllData(dataList)
+
+fulldataset<-loadYearData(100,2017)
 # You can now iterate trough the list
+person_index<-seq(0, length(fulldataset[,1]),4000) #create a sequence to run one person per time
+length<-length(person_index)-1
 
-list.accuracy <- table(1:length(idList))
-list.accuracy.pca <- table(1:length(idList))
-list.time.train.pca <- table(1:length(idList))
-list.time.ann <- table(1:length(idList))
-list.time.ann.pca <- table(1:length(idList))
-list.time.predict <- table(1:length(idList))
-list.time.predict.pca <- table(1:length(idList))
+list.accuracy <- table(1:length)
+list.accuracy.pca <- table(1:length)
+list.time.train.pca <- table(1:length)
+list.time.ann <- table(1:length)
+list.time.ann.pca <- table(1:length)
+list.time.predict <- table(1:length)
+list.time.predict.pca <- table(1:length)
 
-for(i in 1:length(idList)) {
-  dataset <- idList[i]
-  dataset <- data.frame(dataset)
+for(i in 1:length) {
+  
+  lower<-person_index[i]+1
+  dataset<-fulldataset[lower:person_index[i+1],] #dataset for one person
   dataset <- dataset[sample(nrow(dataset)),]
   
   # Divide into training and test set.
@@ -76,6 +80,11 @@ for(i in 1:length(idList)) {
   networkMaxEpochs = 150
   networkLearningFunc = "Std_Backpropagation"
   networkLearningFuncParam = c(0.1, 0)
+
+  pca.networkSize = c(40, 20, 20)
+  pca.networkMaxEpochs = 50
+  pca.networkLearningFuncParam = c(0.2, 0)
+  
   
   #
   # Train neural network model
@@ -87,7 +96,7 @@ for(i in 1:length(idList)) {
   
   # PCA
   start.time <- Sys.time()
-  pca.model <- mlp(x = pca.training_set, y = pca.trainingClass, size = networkSize, maxit = networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = networkLearningFuncParam)
+  pca.model <- mlp(x = pca.training_set, y = pca.trainingClass, size = pca.networkSize, maxit = pca.networkMaxEpochs, learnFunc = networkLearningFunc, learnFuncParams = pca.networkLearningFuncParam)
   list.time.ann.pca[i] <- difftime(Sys.time(), start.time, units = "secs")
   
   #
@@ -130,4 +139,6 @@ for(i in 1:length(idList)) {
   pca.tt<- prop.table(table(pca.agreement))
   list.accuracy.pca[i] <- pca.tt['TRUE']
   
+  print("At iteration: ")
+  print(i)
 }
