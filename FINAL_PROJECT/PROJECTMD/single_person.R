@@ -10,7 +10,7 @@ require(class)
 source('/Users/elisabetta/Desktop/ML/Machine_Learning/PROJECTMD/load_dataset.R') 
 #test on small set to tune parameters, use pca and clustering
 #Data from single persons:
-
+single_person<-function(){
 #get pca object
 single_person_pca <- prcomp(dataset[2:length(dataset[1,])], retx=TRUE, center=TRUE, scale=TRUE)
 single_person_data<-single_person_pca$x[,1:ncol(dataset)-1] #pca object
@@ -76,9 +76,8 @@ for(i in 1:length(var_k)){
       }
 }
 #printing results ordered by accuracy
-print(vark_results)
-vark_results<-rowMeans(vark_results, na.rm = FALSE, dims = 1)
-qplot(unlist(var_k),unlist(vark_results), geom = "line",xlab="Increasing values for the parameter k",ylab="Accuracy (in percentace)") + ggtitle("Accuracy for increasing number of principal components")
-###########################################################################################
-###########################################################################################
-
+#print(vark_results)
+#vark_results<-rowMeans(vark_results, na.rm = FALSE, dims = 1)
+#qplot(unlist(var_k),unlist(vark_results), geom = "line",xlab="Increasing values for the parameter k",ylab="Accuracy (in percentace)") + ggtitle("Accuracy for increasing number of principal components")
+return(vark_results)
+}
